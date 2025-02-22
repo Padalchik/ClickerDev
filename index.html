@@ -45,11 +45,11 @@
         function RequestTelegramUserID() {
             let tg = window.Telegram.WebApp;
             tg.expand();
-            let userID = tg.initDataUnsafe?.user?.id || 0;
+            let userID = tg.initDataUnsafe?.user?.id || "Guest";
 
             function sendToUnity() {
                 if (window.unityInstance) {
-                    window.unityInstance.SendMessage("ClickerManager", "SetUserID", userID);
+                    window.unityInstance.SendMessage("ClickerManager", "SetUserID", userID.toString());
                 } else {
                     setTimeout(sendToUnity, 1000);
                 }
