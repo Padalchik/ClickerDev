@@ -49,7 +49,7 @@
 
             function sendToUnity() {
                 if (window.unityInstance) {
-                    window.unityInstance.SendMessage("ClickerManager", "SetUserID", userID);
+                    window.unityInstance.SendMessage("ClickerManager", "SetUserIDFromJS", userID.toString());
                 } else {
                     setTimeout(sendToUnity, 1000);
                 }
