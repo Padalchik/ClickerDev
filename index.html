@@ -5,48 +5,48 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Unity Web Player | TestClickerTelegram</title>
 
-	<style>
-	#unity-loading-bar {
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-		width: 50%;
-		background: rgba(0, 0, 0, 0.5);
-		padding: 10px;
-		border-radius: 10px;
-		text-align: center;
-		display: none;
-        transition: opacity 0.5s ease;
-	}
+    <style>
+        #unity-loading-bar {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50%;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+            transition: opacity 0.5s ease;
+        }
 
-    #unity-loading-bar.hidden {
-        opacity: 0;
-        pointer-events: none;
-    }
+        #unity-loading-bar.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
 
-	#unity-progress-bar-empty {
-		width: 100%;
-		height: 10px;
-		background: rgba(255, 255, 255, 0.3);
-		border-radius: 5px;
-		overflow: hidden;
-	}
+        #unity-progress-bar-empty {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+            overflow: hidden;
+        }
 
-	#unity-progress-bar-full {
-		width: 0%;
-		height: 100%;
-		background: #4caf50;
-		transition: width 0.3s ease;
-	}
+        #unity-progress-bar-full {
+            width: 0%;
+            height: 100%;
+            background: #4caf50;
+            transition: width 0.3s ease;
+        }
 
-    #unity-logo {
-        width: 100px;
-        height: 100px;
-        background: url('logo.png') center/contain no-repeat;
-        margin: 0 auto 10px auto;
-    }
-	</style>
+        #unity-logo {
+            width: 100px;
+            height: 100px;
+            background: url('logo.png') center/contain no-repeat;
+            margin: 0 auto 10px auto;
+        }
+    </style>
 
     <!-- Подключаем Telegram API -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -102,55 +102,19 @@
             document.body.appendChild(script);
         });
 
-        function RequestTelegramUserID() {
-            if (!window.Telegram || !window.Telegram.WebApp) {
-                console.error("[TG] ❌ Telegram API не доступен!");
-                return;
-            }
-
-            let tg = window.Telegram.WebApp;
-            tg.expand();
-            let userID = tg.initDataUnsafe?.user?.id || 0;
-
-            console.log("[TG] 📡 Получен userID из Telegram:", userID);
-
-            if (!userID || userID === 0) {
-                console.warn("[TG] ⚠️ userID не получен, возможно, Telegram WebApp не передаёт данные.");
-            }
-
-            let attempts = 0; // Количество попыток отправки userID
-
-            function sendToUnity() {
-                if (window.unityInstance) {
-                    console.log("[Unity] 📡 Отправляем userID в Unity:", userID);
-                    window.unityInstance.SendMessage("ClickerManager", "SetUserIDFromJS", userID.toString());
+        function TelegramVibrate() {
+            if (window.Telegram && window.Telegram.WebApp) {
+                if (window.Telegram.WebApp.platform === "ios") {
+                    console.log("📳 Вибрация через Telegram API (iOS)");
+                    window.Telegram.WebApp.HapticFeedback.impactOccurred("medium");
+                } else if (window.Telegram.WebApp.platform === "android" && navigator.vibrate) {
+                    console.log("📳 Вибрация через стандартный API (Android)");
+                    navigator.vibrate(50); // Вибрация 50 мс
                 } else {
-                    attempts++;
-                    if (attempts < 10) { // Не больше 10 попыток
-                        console.log(`[Unity] ⏳ Ожидание Unity (${attempts}/10)...`);
-                        setTimeout(sendToUnity, 1000);
-                    } else {
-                        console.error("[Unity] ❌ Не удалось отправить userID: Unity не загружен!");
-                    }
+                    console.warn("⚠️ Вибрация недоступна: Telegram API не поддерживается!");
                 }
             }
-
-            setTimeout(sendToUnity, 500);
         }
-
-		function TelegramVibrate() {
-			if (window.Telegram && window.Telegram.WebApp) {
-				if (window.Telegram.WebApp.platform === "ios") {
-					console.log("📳 Вибрация через Telegram API (iOS)");
-					window.Telegram.WebApp.HapticFeedback.impactOccurred("medium"); 
-				} else if (window.Telegram.WebApp.platform === "android" && navigator.vibrate) {
-					console.log("📳 Вибрация через стандартный API (Android)");
-					navigator.vibrate(50); // Вибрация 50 мс
-				} else {
-					console.warn("⚠️ Вибрация недоступна: Telegram API не поддерживается!");
-				}
-			}
-		}
     </script>
 </head>
 <body>
